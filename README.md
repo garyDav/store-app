@@ -1,18 +1,26 @@
-# React + Vite
+# React + Vite: StoreApp
 
-### Subtitulo
+### Configuración Eslint - Prettier
 
-[google](https://www.google.com)
+> ESLint tiene una regla `'linebreak-style': ['error', 'unix']` que fuerza un tipo específico de salto de línea `"unix"` → Usa `\n` (Linux/macOS) y `"windows"` → Usa `\r\n` (Windows), Prettier lo maneja de forma indirecta según la configuración del sistema operativo o el control de versiones (Git).
+> Así, los archivos se guardarán con `LF` (`\n`) en el repositorio y se convertirán a `CRLF` (`\r\n`) en Windows si es necesario.
 
-> Todos nuestros archivos de configuración
+### Configuración StoreApp (backend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+```
+docker compose exec mongo bash
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+mongosh -u root -p example
+use admin
+db.createUser({
+  user: 'ggary',
+  pwd: 'storeApp12',
+  roles: ['dbOwner']
+})
+use supermercadodb
+db.createUser({
+  user: 'ggary',
+  pwd: 'storeApp12',
+  roles: ['dbOwner']
+})
+```
