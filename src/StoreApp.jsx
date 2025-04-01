@@ -1,9 +1,10 @@
+import AppRouter from './router/AppRouter'
+
 export default function StoreApp() {
   return (
     <>
-      <div>
-        <h1>Store App</h1>
-      </div>
+      <h1>Store App:</h1>
+      <AppRouter />
     </>
   )
 }
