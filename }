@@ -8,7 +8,7 @@ const initialFormValues = {
 const formValidations = {
   email: [value => value.includes('@'), 'El correo debe de tener una @'],
   password: [
-    value => value.length >= 6, // 1 letra (1 Mayuscula, 1 Minúscula), 1 numero, 1 caracter especial
+    value => value.length >= 6,
     'El password debe de tener más de 6 letras',
   ],
 }
@@ -20,16 +20,13 @@ function LoginPage() {
     formValues,
     onInputChange,
     onResetForm,
-
     isFormValid,
-    emailValid,
-    passwordValid,
   } = useForm(initialFormValues, formValidations)
 
   const handleSubmit = event => {
     event.preventDefault()
 
-    console.log(formValues, isFormValid, emailValid, passwordValid)
+    console.log(formValues, isFormValid)
   }
 
   return (
@@ -51,11 +48,6 @@ function LoginPage() {
                 autoComplete="off"
                 spellCheck="false"
               />
-              {!!emailValid && (
-                <div>
-                  <span>{emailValid}</span>
-                </div>
-              )}
             </div>
 
             <div>
@@ -70,11 +62,6 @@ function LoginPage() {
                 autoComplete="off"
                 spellCheck="false"
               />
-              {!!passwordValid && (
-                <div>
-                  <span>{passwordValid}</span>
-                </div>
-              )}
             </div>
 
             {!isFormValid && (

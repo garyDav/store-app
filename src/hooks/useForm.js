@@ -1,30 +1,59 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
-export const useForm = initialState => {
+export const useForm = (initialState = {}, formValidations = {}) => {
   const [formValues, setFormValues] = useState(initialState)
-  const [formValid, setFormValid] = useState(true)
+  const [formValidation, setFormValidation] = useState({})
+
+  // useEffect(callback, [dependencias])
+  useEffect(() => {
+    createValidators()
+  }, [formValues]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    setFormValues(initialState)
+  }, [initialState])
+
+  const isFormValid = useMemo(() => {
+    for (const formValid of Object.keys(formValidation)) {
+      if (formValidation[formValid] !== null) return false
+    }
+
+    return true
+  }, [formValidation])
 
   const onInputChange = ({ target: { name, value } }) => {
     setFormValues({
       ...formValues,
       [name]: value,
     })
-    setFormValid(true)
   }
 
-  const onReset = () => {
+  const onResetForm = () => {
     setFormValues(initialState)
   }
 
-  const onValidError = () => {
-    setFormValid(false)
+  const createValidators = () => {
+    const formCheckedValues = {}
+
+    for (const formField of Object.keys(formValidations)) {
+      // { key: value, key: value }
+      const [fn, errorMessage] = formValidations[formField]
+
+      formCheckedValues[`${formField}Valid`] = fn(formValues[formField])
+        ? null
+        : errorMessage
+    }
+
+    setFormValidation(formCheckedValues)
   }
 
   return {
+    ...formValues,
     formValues,
     onInputChange,
-    onReset,
-    formValid,
-    onValidError,
+    onResetForm,
+
+    ...formValidation,
+    isFormValid,
   }
 }
