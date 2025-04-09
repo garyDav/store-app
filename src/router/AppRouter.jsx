@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { PublicRoute } from './PublicRoute'
-import LoginPage from '../pages/auth/Login'
+import LoginPage from '../pages/auth/LoginPage'
 
 function AppRouter() {
   return (
