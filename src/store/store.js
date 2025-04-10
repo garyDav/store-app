@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { counterSlice } from './counter/counterSlice'
+
+import { productSlice, uiSlice } from './'
 
 export const store = configureStore({
-  reducer: { counter: counterSlice.reducer },
+  reducer: { product: productSlice.reducer, ui: uiSlice.reducer },
 })
