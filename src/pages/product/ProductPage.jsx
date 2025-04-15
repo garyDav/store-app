@@ -1,4 +1,4 @@
-import { Navbar } from '../../components/Navbar'
+import { Navbar, FabAddNew, ProductModal } from '../../components'
 
 export const ProductPage = () => {
   return (
@@ -36,6 +36,9 @@ export const ProductPage = () => {
           </div>
         </div>
       </div>
+
+      <ProductModal />
+      <FabAddNew />
     </>
   )
 }
