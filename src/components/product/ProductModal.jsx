@@ -1,10 +1,15 @@
 import { useState } from 'react'
-import DatePicker from 'react-datepicker'
+import DatePicker, { registerLocale } from 'react-datepicker'
 import Modal from 'react-modal'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import { useForm } from '../../hooks'
 import { addDays, subDays } from 'date-fns'
+
+import { es } from 'date-fns/locale'
+import { useMemo } from 'react'
+
+registerLocale('es', es)
 
 const customStyles = {
   content: {
@@ -28,10 +33,19 @@ const day = today.getDate()
 const productFormValues = {
   name: '',
   product_date: today,
-  expiration_date: addDays(new Date(year, month, day), 15),
+  expiration_date: addDays(new Date(year, month, day), 30),
   stock: 100,
-  price: 0,
+  price: '',
   tags: [],
+}
+
+const productValidations = {
+  name: [value => value.length > 2, 'Debe ingresar producto valido'],
+  stock: [
+    [value => +value, 'Debe ingresar número'],
+    [value => +value > 29, 'Debe ingresar mínimo 30 unidades'],
+  ],
+  price: [value => +value > 0, 'Debe ingresar precio'],
 }
 
 export const ProductModal = () => {
@@ -42,14 +56,59 @@ export const ProductModal = () => {
     stock,
     price,
     tags,
-
     formValues,
     onInputChange,
-  } = useForm(productFormValues)
+    onResetForm,
+
+    isFormValid,
+    nameValid,
+    stockValid,
+    priceValid,
+  } = useForm(productFormValues, productValidations)
+  const [formSubmitted, setFormSubmitted] = useState(false)
   const [modalIsOpen, setIsOpen] = useState(true)
+
+  const nameClass = useMemo(() => {
+    if (!formSubmitted) return ''
+
+    return !nameValid ? '' : 'is-invalid'
+  }, [formSubmitted, nameValid])
+
+  const stockClass = useMemo(() => {
+    if (!formSubmitted) return ''
+
+    return !stockValid ? '' : 'is-invalid'
+  }, [formSubmitted, stockValid])
+
+  const priceClass = useMemo(() => {
+    if (!formSubmitted) return ''
+
+    return !priceValid ? '' : 'is-invalid'
+  }, [formSubmitted, priceValid])
+
+  const onDateChange = (value, changing) => {
+    onInputChange({ target: { name: changing, value } })
+  }
 
   function closeModal() {
     setIsOpen(false)
+  }
+
+  const onSubmit = event => {
+    event.preventDefault()
+    setFormSubmitted(true)
+
+    console.log(stockValid)
+    return
+
+    // TODO: Validaciones de fecha
+    // TODO: Si el form es invalid no dejar pasar
+    // TODO: Armar nuesta data
+    // TODO: Enviar esta data por HTTP
+
+    onResetForm()
+    closeModal()
+    setFormSubmitted(false)
   }
 
   return (
@@ -63,13 +122,18 @@ export const ProductModal = () => {
       <h1>Nuevo Producto</h1>
       <hr />
 
-      <form>
+      <form onSubmit={onSubmit}>
         <div className="form-group mb-2">
           <label>Fecha de compra</label>
           <DatePicker
+            minDate={subDays(new Date(), 10)}
             selected={product_date}
             className="form-control"
-            onChange={date => console.log(date)}
+            onChange={value => {
+              onDateChange(value, 'product_date')
+            }}
+            locale="es"
+            timeCaption="Hora"
             dateFormat="Pp"
             showTimeSelect
           />
@@ -81,42 +145,63 @@ export const ProductModal = () => {
             minDate={addDays(new Date(), 10)}
             selected={expiration_date}
             className="form-control"
-            onChange={date => console.log(date)}
+            onChange={value => {
+              onDateChange(value, 'expiration_date')
+            }}
+            locale="es"
           />
         </div>
 
         <hr />
         <div className="form-group mb-2">
-          <label>Nombre del producto</label>
+          <label>Producto</label>
           <input
             type="text"
-            className="form-control"
-            placeholder="Producto"
+            className={`form-control ${nameClass}`}
+            placeholder="Nombre del producto"
+            name="name"
+            autoComplete="off"
             value={name}
-            onChange={() => {}}
+            onChange={onInputChange}
           />
+          {nameValid && formSubmitted && (
+            <small className="invalid-feedback">{nameValid}</small>
+          )}
         </div>
 
         <div className="form-group mb-2">
           <label>Stock</label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${stockClass}`}
             placeholder="Unidades disponibles"
+            name="stock"
+            autoComplete="off"
             value={stock}
-            onChange={() => {}}
+            onChange={onInputChange}
           />
+          {stockValid?.length > 0 &&
+            formSubmitted &&
+            stockValid.map(msgError => (
+              <div key={msgError}>
+                <small className="invalid-feedback">{msgError}</small>
+              </div>
+            ))}
         </div>
 
         <div className="form-group mb-2">
           <label>Precio</label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${priceClass}`}
             placeholder="Bs.-"
+            name="price"
             value={price}
-            onChange={() => {}}
+            onChange={onInputChange}
           />
+          {priceValid && formSubmitted && (
+            <small className="invalid-feedback">{priceValid}</small>
+          )}
         </div>
 
         <div className="form-group mb-2">
