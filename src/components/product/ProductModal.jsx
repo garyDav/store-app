@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import DatePicker, { registerLocale } from 'react-datepicker'
 import Modal from 'react-modal'
+import Swal from 'sweetalert2'
+import { es } from 'date-fns/locale'
+import { WithContext as ReactTags, SEPARATORS } from 'react-tag-input'
 
 import 'react-datepicker/dist/react-datepicker.css'
-import { useForm } from '../../hooks'
-import { addDays, subDays } from 'date-fns'
-
-import { es } from 'date-fns/locale'
-import { useMemo } from 'react'
+import { useForm, useUiStore, useProductStore } from '../../hooks'
+import { addDays, differenceInSeconds, subDays, subHours } from 'date-fns'
 
 registerLocale('es', es)
 
@@ -36,7 +36,6 @@ const productFormValues = {
   expiration_date: addDays(new Date(year, month, day), 30),
   stock: 100,
   price: '',
-  tags: [],
 }
 
 const productValidations = {
@@ -49,13 +48,15 @@ const productValidations = {
 }
 
 export const ProductModal = () => {
+  const { isProductModalOpen, closeProductModal } = useUiStore()
+  const { startSavingProduct } = useProductStore()
+
   const {
     name,
     product_date,
     expiration_date,
     stock,
     price,
-    tags,
     formValues,
     onInputChange,
     onResetForm,
@@ -65,8 +66,9 @@ export const ProductModal = () => {
     stockValid,
     priceValid,
   } = useForm(productFormValues, productValidations)
+
   const [formSubmitted, setFormSubmitted] = useState(false)
-  const [modalIsOpen, setIsOpen] = useState(true)
+  const [tags, setTags] = useState([])
 
   const nameClass = useMemo(() => {
     if (!formSubmitted) return ''
@@ -90,31 +92,77 @@ export const ProductModal = () => {
     onInputChange({ target: { name: changing, value } })
   }
 
-  function closeModal() {
-    setIsOpen(false)
+  function onCloseModal() {
+    closeProductModal()
+    onResetForm()
+    setFormSubmitted(false)
   }
 
-  const onSubmit = event => {
+  const onSubmit = async event => {
     event.preventDefault()
     setFormSubmitted(true)
 
-    console.log(stockValid)
-    return
+    const difference = differenceInSeconds(expiration_date, product_date)
 
     // TODO: Validaciones de fecha
-    // TODO: Si el form es invalid no dejar pasar
-    // TODO: Armar nuesta data
-    // TODO: Enviar esta data por HTTP
+    if (isNaN(difference) || difference < 0) {
+      Swal.fire('Fechas incorrectas', 'Revisar las fechas ingresadas', 'error')
+      return
+    }
 
-    onResetForm()
-    closeModal()
-    setFormSubmitted(false)
+    // TODO: Si el form es invalid no dejar pasar
+    if (!isFormValid) {
+      Swal.fire(
+        'Formulario Inválido',
+        'Revisa los campos del formulario',
+        'error',
+      )
+      return
+    }
+
+    // TODO: Armar nuesta data
+    const data = { ...formValues, tags: [] }
+    console.log(data)
+    // TODO: Enviar esta data por HTTP
+    await startSavingProduct(data)
+    // TODO: Cerrar el modal, resetear estados por defecto
+    onCloseModal()
+
+    // TODO: <--- Revisar: date picker --->
+    // minTime={new Date().setHours(0, 0, 0)}
+    // maxTime={new Date().setHours()}
+  }
+
+  const handleDelete = index => {
+    setTags(tags.filter((_, i) => i !== index))
+  }
+  const onTagUpdate = (index, newTag) => {
+    const updatedTags = [...tags]
+    updatedTags.splice(index, 1, newTag)
+    setTags(updatedTags)
+  }
+  const handleAddition = tag => {
+    setTags(prevTags => {
+      return [...prevTags, tag]
+    })
+  }
+  const handleDrag = (tag, currPos, newPos) => {
+    const newTags = tags.slice()
+
+    newTags.splice(currPos, 1)
+    newTags.splice(newPos, 0, tag)
+
+    // re-render
+    setTags(newTags)
+  }
+  const onClearAll = () => {
+    setTags([])
   }
 
   return (
     <Modal
-      isOpen={modalIsOpen}
-      onRequestClose={closeModal}
+      isOpen={isProductModalOpen}
+      onRequestClose={onCloseModal}
       style={customStyles}
       className="modal"
       overlayClassName="modal-fondo"
@@ -127,11 +175,10 @@ export const ProductModal = () => {
           <label>Fecha de compra</label>
           <DatePicker
             minDate={subDays(new Date(), 10)}
+            maxDate={new Date()}
             selected={product_date}
             className="form-control"
-            onChange={value => {
-              onDateChange(value, 'product_date')
-            }}
+            onChange={value => onDateChange(value, 'product_date')}
             locale="es"
             timeCaption="Hora"
             dateFormat="Pp"
@@ -145,10 +192,9 @@ export const ProductModal = () => {
             minDate={addDays(new Date(), 10)}
             selected={expiration_date}
             className="form-control"
-            onChange={value => {
-              onDateChange(value, 'expiration_date')
-            }}
+            onChange={value => onDateChange(value, 'expiration_date')}
             locale="es"
+            dateFormat="P"
           />
         </div>
 
@@ -183,8 +229,8 @@ export const ProductModal = () => {
           {stockValid?.length > 0 &&
             formSubmitted &&
             stockValid.map(msgError => (
-              <div key={msgError}>
-                <small className="invalid-feedback">{msgError}</small>
+              <div key={msgError} className="invalid-feedback">
+                <span>{msgError}</span>
               </div>
             ))}
         </div>
@@ -206,6 +252,20 @@ export const ProductModal = () => {
 
         <div className="form-group mb-2">
           <label>Características</label>
+          <ReactTags
+            tags={tags}
+            separators={[SEPARATORS.ENTER, SEPARATORS.TAB, SEPARATORS.COMMA]}
+            handleDelete={handleDelete}
+            handleAddition={handleAddition}
+            handleDrag={handleDrag}
+            onTagUpdate={onTagUpdate}
+            inputFieldPosition="inline"
+            inline
+            editable
+            clearAll
+            onClearAll={onClearAll}
+            maxTags={7}
+          />
         </div>
 
         <button type="submit" className="btn btn-outline-primary btn-block">

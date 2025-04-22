@@ -17,8 +17,10 @@ export const useProductStore = () => {
     // Todo sale bien
     if (product._id) {
       // Actualizar la BBDD (Update)
+      console.log('Update')
     } else {
       // Crear: guardar a la BBDD (Create)
+      console.log('Create')
     }
   }
 
