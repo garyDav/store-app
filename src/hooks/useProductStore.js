@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { onSetActiveProduct } from '../store'
+import { onAddNewProduct, onSetActiveProduct } from '../store'
 
 export const useProductStore = () => {
   // Declaraciones de variables
@@ -20,7 +20,9 @@ export const useProductStore = () => {
       console.log('Update')
     } else {
       // Crear: guardar a la BBDD (Create)
+      // TODO: llevar a la API
       console.log('Create')
+      dispatch(onAddNewProduct({ ...product, _id: new Date().getTime() }))
     }
   }
 

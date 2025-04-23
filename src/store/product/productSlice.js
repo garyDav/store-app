@@ -1,12 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit' // Immer library
+import { addDays } from 'date-fns'
 
 const tempProduct = {
-  name: 'Manzana',
+  _id: new Date().getTime(),
+  name: 'Leche Entera',
   product_date: new Date(),
-  expiration_date: new Date('2025-04-30T00:00:00.000Z'),
-  stock: 200,
-  price: 2,
-  tags: ['fruta', 'rojo', 'agua'],
+  expiration_date: addDays(new Date(), 20),
+  stock: 120,
+  price: 7,
+  tags: ['bebida', 'natural', 'refrigerada'],
 }
 
 export const productSlice = createSlice({

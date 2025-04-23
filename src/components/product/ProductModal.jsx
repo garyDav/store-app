@@ -48,9 +48,9 @@ const productValidations = {
 }
 
 export const ProductModal = () => {
+  // Custom Hooks
   const { isProductModalOpen, closeProductModal } = useUiStore()
   const { startSavingProduct } = useProductStore()
-
   const {
     name,
     product_date,
@@ -67,9 +67,11 @@ export const ProductModal = () => {
     priceValid,
   } = useForm(productFormValues, productValidations)
 
+  // Estados locales
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [tags, setTags] = useState([])
 
+  // Funciones que devuelven un class CSS
   const nameClass = useMemo(() => {
     if (!formSubmitted) return ''
 
@@ -88,19 +90,22 @@ export const ProductModal = () => {
     return !priceValid ? '' : 'is-invalid'
   }, [formSubmitted, priceValid])
 
+  // Función para el cambio de los DatePicker
   const onDateChange = (value, changing) => {
     onInputChange({ target: { name: changing, value } })
   }
 
-  function onCloseModal() {
+  // Cierra el modal y resetea el formulario
+  const onCloseModal = () => {
     closeProductModal()
     onResetForm()
     setFormSubmitted(false)
   }
 
+  // Ejecuta el evento submit
   const onSubmit = async event => {
-    event.preventDefault()
-    setFormSubmitted(true)
+    event.preventDefault() // Evita el Full refresh
+    setFormSubmitted(true) // Cuando hacemos click la primera vez en el boton de 'guardar'
 
     const difference = differenceInSeconds(expiration_date, product_date)
 
@@ -121,7 +126,7 @@ export const ProductModal = () => {
     }
 
     // TODO: Armar nuesta data
-    const data = { ...formValues, tags: [] }
+    const data = { ...formValues, tags: tags.map(({ text }) => text) }
     console.log(data)
     // TODO: Enviar esta data por HTTP
     await startSavingProduct(data)
@@ -133,6 +138,7 @@ export const ProductModal = () => {
     // maxTime={new Date().setHours()}
   }
 
+  /* Manejo de ReactTags */
   const handleDelete = index => {
     setTags(tags.filter((_, i) => i !== index))
   }
@@ -158,6 +164,7 @@ export const ProductModal = () => {
   const onClearAll = () => {
     setTags([])
   }
+  /* FIN Manejo de ReactTags */
 
   return (
     <Modal
