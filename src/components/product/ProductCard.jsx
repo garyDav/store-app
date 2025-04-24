@@ -6,11 +6,13 @@ export const ProductCard = ({
   stock = 0,
   price = 0,
   tags = [],
+  img = '',
 } = {}) => {
   return (
     <div className="card" style={{ width: '18rem' }}>
       <img
-        src="https://placehold.co/286x180"
+        // src="https://placehold.co/286x180"
+        src={img}
         className="card-img-top"
         alt="Product Image"
       />

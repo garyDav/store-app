@@ -1,9 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 
-import { productSlice, uiSlice } from './'
+import { productSlice, uiSlice, authSlice } from './'
 
 export const store = configureStore({
-  reducer: { product: productSlice.reducer, ui: uiSlice.reducer },
+  reducer: {
+    auth: authSlice.reducer,
+    product: productSlice.reducer,
+    ui: uiSlice.reducer,
+  },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: false,

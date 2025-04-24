@@ -7,7 +7,7 @@ import { WithContext as ReactTags, SEPARATORS } from 'react-tag-input'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import { useForm, useUiStore, useProductStore } from '../../hooks'
-import { addDays, differenceInSeconds, subDays, subHours } from 'date-fns'
+import { addDays, differenceInSeconds, subDays } from 'date-fns'
 
 registerLocale('es', es)
 
@@ -100,6 +100,7 @@ export const ProductModal = () => {
     closeProductModal()
     onResetForm()
     setFormSubmitted(false)
+    setTags([])
   }
 
   // Ejecuta el evento submit
