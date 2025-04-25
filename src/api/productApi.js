@@ -7,11 +7,11 @@ const productApi = axios.create({
   baseURL: VITE_API_URL,
 })
 
-// TODO: configurar interceptores
+// DONE: configurar interceptores
 productApi.interceptors.request.use(config => {
   config.headers = {
     ...config.headers,
-    'x-token': localStorage.getItem('token') || '',
+    Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
   }
 
   return config

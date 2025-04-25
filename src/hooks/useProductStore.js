@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
+
 import { onAddNewProduct, onSetActiveProduct } from '../store'
+import { productApi } from '../api'
 
 export const useProductStore = () => {
   // Declaraciones de variables
@@ -12,17 +14,16 @@ export const useProductStore = () => {
   }
 
   const startSavingProduct = async product => {
-    // TODO: llegar al backend HTTP
+    // DONE: llegar al backend HTTP
 
     // Todo sale bien
     if (product._id) {
       // Actualizar la BBDD (Update)
       console.log('Update')
     } else {
-      // Crear: guardar a la BBDD (Create)
-      // TODO: llevar a la API
-      console.log('Create')
-      dispatch(onAddNewProduct({ ...product, _id: new Date().getTime() }))
+      // Crear nuevo producto (Create)
+      const { data } = await productApi.post('/products', product)
+      dispatch(onAddNewProduct({ ...product, _id: data._id }))
     }
   }
 

@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import { useAuthStore } from '../../hooks'
 
 export const ProductCard = ({
   name = '',
@@ -8,6 +9,8 @@ export const ProductCard = ({
   tags = [],
   img = '',
 } = {}) => {
+  const { user } = useAuthStore()
+
   return (
     <div className="card" style={{ width: '18rem' }}>
       <img
@@ -30,14 +33,18 @@ export const ProductCard = ({
         ))}
       </ul>
       <div className="card-body d-flex justify-content-between">
-        <button href="#" className="btn btn-outline-success">
-          <i className="fa-solid fa-cart-plus"></i>
-          <span> Comprar</span>
-        </button>
-        <button href="#" className="btn btn-outline-danger">
-          <i className="fa-solid fa-trash"></i>
-          <span> Eliminar</span>
-        </button>
+        {!user?.rol?.includes('admin') && (
+          <button className="btn btn-outline-success">
+            <i className="fa-solid fa-cart-plus"></i>
+            <span> Comprar</span>
+          </button>
+        )}
+        {user?.rol?.includes('admin') && (
+          <button className="btn btn-outline-danger">
+            <i className="fa-solid fa-trash"></i>
+            <span> Eliminar</span>
+          </button>
+        )}
       </div>
     </div>
   )

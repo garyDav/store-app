@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Swal from 'sweetalert2'
 
 import { useForm } from '../../hooks/useForm'
 
@@ -74,6 +75,12 @@ function LoginPage() {
 
     console.log(formRegister)
   }
+
+  useEffect(() => {
+    if (errorMessage !== undefined) {
+      Swal.fire('Error en la autenticación', errorMessage, 'error')
+    }
+  }, [errorMessage])
 
   return (
     <div className="container login-container">

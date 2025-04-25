@@ -110,13 +110,13 @@ export const ProductModal = () => {
 
     const difference = differenceInSeconds(expiration_date, product_date)
 
-    // TODO: Validaciones de fecha
+    // DONE: Validaciones de fecha
     if (isNaN(difference) || difference < 0) {
       Swal.fire('Fechas incorrectas', 'Revisar las fechas ingresadas', 'error')
       return
     }
 
-    // TODO: Si el form es invalid no dejar pasar
+    // DONE: Si el form es invalid no dejar pasar
     if (!isFormValid) {
       Swal.fire(
         'Formulario Inválido',
@@ -126,15 +126,15 @@ export const ProductModal = () => {
       return
     }
 
-    // TODO: Armar nuesta data
+    // DONE: Armar nuesta data
     const data = { ...formValues, tags: tags.map(({ text }) => text) }
     console.log(data)
-    // TODO: Enviar esta data por HTTP
+    // DONE: Enviar esta data por HTTP
     await startSavingProduct(data)
-    // TODO: Cerrar el modal, resetear estados por defecto
+    // DONE: Cerrar el modal, resetear estados por defecto
     onCloseModal()
 
-    // TODO: <--- Revisar: date picker --->
+    // <--- Revisar: date picker --->
     // minTime={new Date().setHours(0, 0, 0)}
     // maxTime={new Date().setHours()}
   }

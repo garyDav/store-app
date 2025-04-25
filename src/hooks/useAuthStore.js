@@ -3,11 +3,11 @@ import { clearErrorMessage, onChecking, onLogin, onLogout } from '../store'
 import { productApi } from '../api'
 
 export const useAuthStore = () => {
-  // TODO: Uso de nuestro Store
+  // DONE: Uso de nuestro Store
   const { status, user, errorMessage } = useSelector(state => state.auth)
   const dispatch = useDispatch()
 
-  // TODO: Métodos para login
+  // DONE: Métodos para login
   const startLogin = async ({ email, password }) => {
     dispatch(onChecking())
     try {
@@ -15,8 +15,9 @@ export const useAuthStore = () => {
       localStorage.setItem('token', data.token)
       localStorage.setItem('token-init-date', new Date().getTime())
 
-      console.log(data)
-      // dispatch(onLogin({ name: data.name, uid: data.uid }))
+      dispatch(
+        onLogin({ fullName: data.fullName, rol: data.rol, email: data.email }),
+      )
     } catch (error) {
       console.error(error)
       dispatch(onLogout('Credenciales incorrectas'))
@@ -28,7 +29,6 @@ export const useAuthStore = () => {
 
   // TODO: PRUEBA FINAL, Métodos para register
 
-  // TODO::Check auth
   /*const checkAuthToken = async () => {
     const token = localStorage.getItem('token')
     if (!token) return dispatch(onLogout())
@@ -43,21 +43,35 @@ export const useAuthStore = () => {
       dispatch(onLogout())
     }
   }*/
-  // TODO: Logout
+  const checkAuthToken = () => {
+    const token = localStorage.getItem('token')
+    if (!token) return dispatch(onLogout())
+
+    const tokenInitDate = localStorage.getItem('token-init-date')
+    const diffTime = new Date().getTime() - tokenInitDate
+    const diffMinutes = diffTime / (1000 * 60)
+    if (diffMinutes >= 60) {
+      localStorage.clear()
+      dispatch(onLogout())
+    }
+  }
+
+  // DONE: Logout
   const startLogout = () => {
     localStorage.clear()
     dispatch(onLogout())
   }
 
   return {
-    // TODO: Propiedades
+    // DONE: Propiedades
     status,
     user,
     errorMessage,
 
-    // TODO: Métodos
+    // DONE: Métodos
     startLogin,
     startLogout,
+    checkAuthToken,
 
     // TODO: PRUEBA FINAL, Método Register
   }

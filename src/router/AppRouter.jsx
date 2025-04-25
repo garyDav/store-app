@@ -1,24 +1,42 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+
 import { PublicRoute } from './PublicRoute'
 import LoginPage from '../pages/auth/LoginPage'
 import { ProductPage } from '../pages/product/ProductPage'
+import { PrivateRoute } from './PrivateRoute'
+import { useAuthStore } from '../hooks'
 
 function AppRouter() {
+  const { status, checkAuthToken } = useAuthStore()
+
+  useEffect(() => {
+    checkAuthToken()
+  }, [])
+
+  /*if (status === 'checking') {
+    return (
+      <div className="loading-screen">
+        <h1>Cargando...</h1>
+      </div>
+    )
+  }*/
+
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path="/"
           element={
-            <PublicRoute isAuthenticated={false}>
+            <PrivateRoute isAuthenticated={status === 'authenticated'}>
               <ProductPage />
-            </PublicRoute>
+            </PrivateRoute>
           }
         />
         <Route
           path="/login"
           element={
-            <PublicRoute isAuthenticated={false}>
+            <PublicRoute isAuthenticated={status === 'authenticated'}>
               <LoginPage />
             </PublicRoute>
           }
