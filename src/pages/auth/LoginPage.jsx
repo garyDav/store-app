@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useForm } from '../../hooks/useForm'
 
 import './LoginPage.css'
+import { useAuthStore } from '../../hooks'
 
 const loginFormValues = {
   email: '',
@@ -28,8 +29,13 @@ const registerFormValues = {
 }
 
 function LoginPage() {
-  const [formSubmitted, setFormSubmitted] = useState(false)
+  // Custom Hooks
+  const {
+    errorMessage,
 
+    startLogin,
+    // TODO: PRUEBA FINAL, Método Register
+  } = useAuthStore()
   const {
     email: loginEmail,
     password: loginPassword,
@@ -40,7 +46,6 @@ function LoginPage() {
     emailValid,
     passwordValid,
   } = useForm(loginFormValues, loginValidations)
-
   const {
     fullName: registerFullName,
     email: registerEmail,
@@ -51,6 +56,9 @@ function LoginPage() {
     onInputChange: onRegisterInputChange,
   } = useForm(registerFormValues)
 
+  // Estados Locales
+  const [formSubmitted, setFormSubmitted] = useState(false)
+
   const loginSubmit = event => {
     event.preventDefault()
     setFormSubmitted(true)
@@ -58,7 +66,7 @@ function LoginPage() {
     if (!isFormValid) return
 
     // Thunk HTTP API
-    console.log(formLogin, isFormValid, emailValid, passwordValid)
+    startLogin(formLogin)
   }
 
   const registerSubmit = event => {

@@ -4,7 +4,7 @@ import { getEnvVariables } from '../helpers'
 const { VITE_API_URL } = getEnvVariables()
 
 const productApi = axios.create({
-  balseURL: VITE_API_URL,
+  baseURL: VITE_API_URL,
 })
 
 // TODO: configurar interceptores

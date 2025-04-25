@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { clearErrorMessage, onChecking, onLogin, onLogout } from '../store'
-import productApi from '../api'
+import { productApi } from '../api'
 
 export const useAuthStore = () => {
   // TODO: Uso de nuestro Store
@@ -14,8 +14,11 @@ export const useAuthStore = () => {
       const { data } = await productApi.post('/auth/login', { email, password })
       localStorage.setItem('token', data.token)
       localStorage.setItem('token-init-date', new Date().getTime())
-      dispatch(onLogin({ name: data.name, uid: data.uid }))
+
+      console.log(data)
+      // dispatch(onLogin({ name: data.name, uid: data.uid }))
     } catch (error) {
+      console.error(error)
       dispatch(onLogout('Credenciales incorrectas'))
       setTimeout(() => {
         dispatch(clearErrorMessage())
@@ -23,25 +26,39 @@ export const useAuthStore = () => {
     }
   }
 
-  // TODO: Métodos para register
-  const startRegister = async ({ fullName, email, password }) => {
-    dispatch(onChecking())
+  // TODO: PRUEBA FINAL, Métodos para register
+
+  // TODO::Check auth
+  /*const checkAuthToken = async () => {
+    const token = localStorage.getItem('token')
+    if (!token) return dispatch(onLogout())
+
     try {
-      const { data } = await productApi.post('/auth/register', {})
+      const { data } = await productApi.get('/auth/renew')
       localStorage.setItem('token', data.token)
       localStorage.setItem('token-init-date', new Date().getTime())
       dispatch(onLogin({ name: data.name, uid: data.uid }))
     } catch (error) {
-      dispatch(onLogout(error.response.data?.msg || 'Error al crear la cuenta'))
-      setTimeout(() => {
-        dispatch(clearErrorMessage())
-      }, 500)
+      localStorage.clear()
+      dispatch(onLogout())
     }
-  }
-  // TODO: Check auth
+  }*/
   // TODO: Logout
+  const startLogout = () => {
+    localStorage.clear()
+    dispatch(onLogout())
+  }
 
   return {
+    // TODO: Propiedades
+    status,
+    user,
+    errorMessage,
+
+    // TODO: Métodos
     startLogin,
+    startLogout,
+
+    // TODO: PRUEBA FINAL, Método Register
   }
 }
