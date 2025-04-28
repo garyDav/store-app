@@ -12,15 +12,16 @@ function AppRouter() {
 
   useEffect(() => {
     checkAuthToken()
+    console.log(status)
   }, [])
 
-  /*if (status === 'checking') {
+  if (status === 'checking') {
     return (
       <div className="loading-screen">
         <h1>Cargando...</h1>
       </div>
     )
-  }*/
+  }
 
   return (
     <BrowserRouter>

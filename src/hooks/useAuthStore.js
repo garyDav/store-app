@@ -14,6 +14,7 @@ export const useAuthStore = () => {
       const { data } = await productApi.post('/auth/login', { email, password })
       localStorage.setItem('token', data.token)
       localStorage.setItem('token-init-date', new Date().getTime())
+      localStorage.setItem('user', JSON.stringify(data))
 
       dispatch(
         onLogin({ fullName: data.fullName, rol: data.rol, email: data.email }),
@@ -53,6 +54,9 @@ export const useAuthStore = () => {
     if (diffMinutes >= 60) {
       localStorage.clear()
       dispatch(onLogout())
+    } else {
+      const localUser = JSON.parse(localStorage.getItem('user'))
+      dispatch(onLogin(localUser))
     }
   }
 
